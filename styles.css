@@ -81,7 +81,7 @@ body::before {
 }
 
 .webcam-container {
-    width: 320px;
+    width: 600px;
     background: #222;
     display: flex;
     flex-direction: column;
@@ -122,9 +122,10 @@ body::before {
 #video,
 #poseCanvas {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
     image-rendering: pixelated;
+    object-fit: contain; /* This maintains aspect ratio */
 }
 
 #poseCanvas {
