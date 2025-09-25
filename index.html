@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pose K.O.</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="header">
+        <div class="title">Pose K.O.</div>
+        <div class="author">BSCS</div>
+    </div>
+
+    <div class="main-container">
+        <div class="game-container">
+            <canvas id="gameCanvas"></canvas>
+
+            <!-- Health bars -->
+            <div class="health-bar-container player-health">
+                <div class="health-label">PLAYER</div>
+                <div class="health-bar" id="playerHealthBar" style="width: 100%;"></div>
+            </div>
+
+            <div class="health-bar-container opponent-health">
+                <div class="health-label">TYSON</div>
+                <div class="health-bar" id="opponentHealthBar" style="width: 100%;"></div>
+            </div>
+
+            <!-- Corner decorations -->
+            <div class="corner-decoration top-left"></div>
+            <div class="corner-decoration top-right"></div>
+            <div class="corner-decoration bottom-left"></div>
+            <div class="corner-decoration bottom-right"></div>
+
+            <!-- Flame accent -->
+            <div class="flame-accent"></div>
+
+            <div id="gameOverlay" class="game-overlay">
+                <h1 class="game-title">Pose K.O.</h1>
+                <p class="game-subtitle">Pose to Victory!</p>
+
+                <div class="game-instructions">
+                    <h3 class="instruction-title">CONTROLS</h3>
+                    <ul class="instruction-list">
+                        <li class="instruction-item">
+                            <div class="instruction-icon">👊</div>
+                            <span>LEFT ARM UP = LEFT PUNCH</span>
+                        </li>
+                        <li class="instruction-item">
+                            <div class="instruction-icon">👊</div>
+                            <span>RIGHT ARM UP = RIGHT PUNCH</span>
+                        </li>
+                        <li class="instruction-item">
+                            <div class="instruction-icon">🛡️</div>
+                            <span>BOTH ARMS UP = BLOCK</span>
+                        </li>
+                        <li class="instruction-item">
+                            <div class="instruction-icon">↔️</div>
+                            <span>LEAN LEFT/RIGHT = DODGE</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <button id="startBtn" class="start-btn">FIGHT</button>
+            </div>
+        </div>
+
+        <div class="webcam-container">
+            <div class="webcam-header">
+                <div class="webcam-title">PLAYER'S CAMERA</div>
+                <div class="webcam-subtitle">POSE DETECTION</div>
+            </div>
+
+            <div class="video-wrapper">
+                <video id="video" autoplay muted playsinline></video>
+                <canvas id="poseCanvas"></canvas>
+                <div id="loadingIndicator" class="loading-indicator hidden">
+                    <div class="loading-spinner"></div>
+                    <div>LOADING...</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="cameraBtn" class="btn">OPEN CAMERA</button>
+
+                <div class="status-container">
+                    <div class="status-label">CURRENT POSE</div>
+                    <div id="poseStatus" class="status-value">IDLE</div>
+                </div>
+
+                <div class="pose-indicator">
+                    <div class="pose-item" id="pose-left">
+                        <div class="pose-icon">L</div>
+                        <div class="pose-name">LEFT</div>
+                    </div>
+                    <div class="pose-item" id="pose-right">
+                        <div class="pose-icon">R</div>
+                        <div class="pose-name">RIGHT</div>
+                    </div>
+                    <div class="pose-item" id="pose-block">
+                        <div class="pose-icon">B</div>
+                        <div class="pose-name">BLOCK</div>
+                    </div>
+                    <div class="pose-item" id="pose-dodge">
+                        <div class="pose-icon">D</div>
+                        <div class="pose-name">DODGE</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
