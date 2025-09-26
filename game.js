@@ -3,6 +3,8 @@ let detector;
 let gameRunning = false;
 let currentPose = 'idle';
 let cameraActive = false;
+let lastPoseUpdate = 0;
+const POSE_UPDATE_INTERVAL = 1;
 
 // Initialize when page loads
 window.addEventListener('load', init);
@@ -136,22 +138,29 @@ async function detectPose() {
             // Detect action
             const action = detectAction(pose);
 
-            // Update pose status
-            if (action !== currentPose) {
-                currentPose = action;
-                document.getElementById('poseStatus').textContent = action.toUpperCase();
+            const now = Date.now();
 
-                // Update pose indicators
-                document.querySelectorAll('.pose-item').forEach(item => item.classList.remove('active'));
+            // Update pose status only at the specified interval
+            if (now - lastPoseUpdate > POSE_UPDATE_INTERVAL) {
+                lastPoseUpdate = now;
 
-                if (action === 'left_punch'){
-                    document.getElementById('pose-left').classList.add('active');
-                } else if (action === 'right_punch'){
-                    document.getElementById('pose-right').classList.add('active');
-                } else if (action === 'block'){
-                    document.getElementById('pose-block').classList.add('active');
-                } else if (action === 'dodge'){
-                    document.getElementById('pose-dodge').classList.add('active');
+                // Update pose status
+                if (action !== currentPose) {
+                    currentPose = action;
+                    document.getElementById('poseStatus').textContent = action.toUpperCase();
+
+                    // Update pose indicators
+                    document.querySelectorAll('.pose-item').forEach(item => item.classList.remove('active'));
+
+                    if (action === 'left_punch') {
+                        document.getElementById('pose-left').classList.add('active');
+                    } else if (action === 'right_punch') {
+                        document.getElementById('pose-right').classList.add('active');
+                    } else if (action === 'block') {
+                        document.getElementById('pose-block').classList.add('active');
+                    } else if (action === 'dodge') {
+                        document.getElementById('pose-dodge').classList.add('active');
+                    }
                 }
             }
 
@@ -181,11 +190,11 @@ function drawPose(pose) {
 
     // Draw skeleton
     const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.MoveNet);
-    
+
     adjacentKeyPoints.forEach(([i, j]) => {
         const kp1 = keypoints[i];
         const kp2 = keypoints[j];
-        
+
         if (kp1.score > 0.3 && kp2.score > 0.3) {
             poseCtx.beginPath();
             poseCtx.moveTo(kp1.x, kp1.y);
@@ -206,9 +215,11 @@ function detectAction(pose) {
     const leftShoulder = keypoints.find(kp => kp.name === 'left_shoulder');
     const rightShoulder = keypoints.find(kp => kp.name === 'right_shoulder');
     const nose = keypoints.find(kp => kp.name === 'nose');
+    const leftElbow = keypoints.find(kp => kp.name === 'left_elbow');
+    const rightElbow = keypoints.find(kp => kp.name === 'right_elbow');
 
     // Check confidence scores
-    if (leftWrist.score < 0.5 || rightWrist.score <0.5 ||
+    if (leftWrist.score < 0.5 || rightWrist.score < 0.5 ||
         leftShoulder.score < 0.5 || rightShoulder.score < 0.5) {
         return 'idle';
     }
@@ -220,7 +231,22 @@ function detectAction(pose) {
     const rightWristRelX = rightWrist.x - rightShoulder.x;
 
     // Detect actions based on pose
-    if (leftWristRelY < -20 && rightWristRelY > 20) {
+    if (rightShoulder && rightElbow && rightWrist) {
+        const angle = getAngle(rightShoulder, rightElbow, rightWrist);
+
+        if (angle > 140) {
+            return 'right_punch'; // Right hand extended
+        }
+    }
+    if (leftShoulder && leftElbow && leftWrist) {
+        const angle = getAngle(leftShoulder, leftElbow, leftWrist);
+
+        if (angle > 140) {
+            return 'left_punch'; // Left hand extended
+        }
+    }
+
+    /* if (leftWristRelY < -20 && rightWristRelY > 20) {
         return 'left_punch'; // Left hand up, right hand down
     } else if (rightWristRelY < -50 && leftWristRelY > 20) {
         return 'right_punch'; // Right hand up, left hand down
@@ -230,9 +256,22 @@ function detectAction(pose) {
         return 'dodge_left'; // Head moved left
     } else if (nose.x > rightShoulder.x + 30) {
         return 'dodge_right'; // Head moved right
-    } 
+    } */
 
     return 'idle';
+}
+
+function getAngle(a, b, c) {
+    // Angle at point b (a-b-c)
+    const ab = { x: a.x - b.x, y: a.y - b.y };
+    const cb = { x: c.x - b.x, y: c.y - b.y };
+
+    const dot = ab.x * cb.x + ab.y * cb.y;
+    const magAB = Math.sqrt(ab.x * ab.x + ab.y * ab.y);
+    const magCB = Math.sqrt(cb.x * cb.x + cb.y * cb.y);
+
+    const cosine = dot / (magAB * magCB);
+    return Math.acos(cosine) * (180 / Math.PI); // degrees
 }
 
 document.getElementById('startBtn').addEventListener('click', function () {
