@@ -218,48 +218,36 @@ function detectAction(pose) {
     const leftElbow = keypoints.find(kp => kp.name === 'left_elbow');
     const rightElbow = keypoints.find(kp => kp.name === 'right_elbow');
 
-    // Check confidence scores
-    if (leftWrist.score < 0.5 || rightWrist.score < 0.5 ||
-        leftShoulder.score < 0.5 || rightShoulder.score < 0.5) {
-        return 'idle';
-    }
-
-    // Calculate positions relative to shoulders
-    const leftWristRelY = leftWrist.y - leftShoulder.y;
-    const rightWristRelY = rightWrist.y - rightShoulder.y;
-    const leftWristRelX = leftWrist.x - leftShoulder.x;
-    const rightWristRelX = rightWrist.x - rightShoulder.x;
-
-    let isBlock = false;
-
     // Detect actions based on pose
-    if (rightShoulder && rightElbow && rightWrist) {
-        const angle = getAngle(rightShoulder, rightElbow, rightWrist);
-
-        if (angle > 140) {
+    if (rightElbow.y > rightWrist.y) {
+        const right_punch_angle = getAngle(rightShoulder, rightElbow, rightWrist);
+        if (right_punch_angle > 140) {
             return 'right punch'; // Right hand extended
         }
     }
 
-    if (leftShoulder && leftElbow && leftWrist) {
-        const angle = getAngle(leftShoulder, leftElbow, leftWrist);
-
-        if (angle > 140) {
+    if (leftElbow.y > leftWrist.y) {
+        const left_punch_angle = getAngle(leftShoulder, leftElbow, leftWrist);
+        if (left_punch_angle > 140) {
             return 'left punch'; // Left hand extended
         }
     }
 
-    if (leftWrist && leftElbow && rightWrist && rightElbow) {
-        // wrists above elbows (upright arms)
-        const leftUpright = leftWrist.y < leftElbow.y;
-        const rightUpright = rightWrist.y < rightElbow.y;
-        console.log('Left Upright:', leftUpright, 'Right Upright:', rightUpright);
-
-        if (leftUpright && rightUpright ) {
-            isBlock = true;
-            return 'block';
-        }
+    // wrists above elbows (upright arms)
+    const leftUpright = leftWrist.y < leftElbow.y;
+    const rightUpright = rightWrist.y < rightElbow.y;
+    if (leftUpright && rightUpright) {
+        return 'block';
     }
+
+    // Distance between shoulders
+    const shoulderDist = Math.abs(rightShoulder.x - leftShoulder.x);
+    console.log('Shoulder Distance:', shoulderDist);
+    if (shoulderDist < 50) { // shoulders too close = rotated
+        return 'dodge';
+    }
+
+
 
     /* if (leftWristRelY < -20 && rightWristRelY > 20) {
         return 'left_punch'; // Left hand up, right hand down
