@@ -4,7 +4,7 @@ let gameRunning = false;
 let currentPose = 'idle';
 let cameraActive = false;
 let lastPoseUpdate = 0;
-const POSE_UPDATE_INTERVAL = 1;
+const POSE_UPDATE_INTERVAL = 100;
 
 // Initialize when page loads
 window.addEventListener('load', init);
@@ -152,9 +152,9 @@ async function detectPose() {
                     // Update pose indicators
                     document.querySelectorAll('.pose-item').forEach(item => item.classList.remove('active'));
 
-                    if (action === 'left_punch') {
+                    if (action === 'left punch') {
                         document.getElementById('pose-left').classList.add('active');
-                    } else if (action === 'right_punch') {
+                    } else if (action === 'right punch') {
                         document.getElementById('pose-right').classList.add('active');
                     } else if (action === 'block') {
                         document.getElementById('pose-block').classList.add('active');
@@ -230,19 +230,34 @@ function detectAction(pose) {
     const leftWristRelX = leftWrist.x - leftShoulder.x;
     const rightWristRelX = rightWrist.x - rightShoulder.x;
 
+    let isBlock = false;
+
     // Detect actions based on pose
     if (rightShoulder && rightElbow && rightWrist) {
         const angle = getAngle(rightShoulder, rightElbow, rightWrist);
 
         if (angle > 140) {
-            return 'right_punch'; // Right hand extended
+            return 'right punch'; // Right hand extended
         }
     }
+
     if (leftShoulder && leftElbow && leftWrist) {
         const angle = getAngle(leftShoulder, leftElbow, leftWrist);
 
         if (angle > 140) {
-            return 'left_punch'; // Left hand extended
+            return 'left punch'; // Left hand extended
+        }
+    }
+
+    if (leftWrist && leftElbow && rightWrist && rightElbow) {
+        // wrists above elbows (upright arms)
+        const leftUpright = leftWrist.y < leftElbow.y;
+        const rightUpright = rightWrist.y < rightElbow.y;
+        console.log('Left Upright:', leftUpright, 'Right Upright:', rightUpright);
+
+        if (leftUpright && rightUpright ) {
+            isBlock = true;
+            return 'block';
         }
     }
 
