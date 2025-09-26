@@ -53,9 +53,16 @@ async function toggleCamera() {
                 video.onloadedmetadata = () => resolve(video);
             });
 
+            // Mirror video for better UX
+            video.style.transform = 'scaleX(-1)';
+
             // Set canvas dimensions to match video
             poseCanvas.width = video.videoWidth;
             poseCanvas.height = video.videoHeight;
+
+            // Mirror canvas for better UX
+            poseCtx.translate(poseCanvas.width, 0);
+            poseCtx.scale(-1, 1);
 
             // Load pose detection model
             await loadPoseModel();
