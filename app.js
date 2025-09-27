@@ -1,50 +1,51 @@
-let video, poseCanvas, poseCtx, gameCanvas, gameCtx;
+let video, poseCanvas, poseCtx;
 let detector;
-let gameRunning = false;
-let currentPose = 'idle';
+let currentPose = "idle";
 let cameraActive = false;
 let lastPoseUpdate = 0;
-const POSE_UPDATE_INTERVAL = 50;
+const POSE_UPDATE_INTERVAL = 100;
 
 // Initialize when page loads
-window.addEventListener('load', init);
-
+if (document.readyState === "complete") {
+    init();
+} else {
+    window.addEventListener("load", init); // Wait for load event
+}
 // Initialize the application
 async function init() {
     // Get DOM elements
-    video = document.getElementById('video');
-    poseCanvas = document.getElementById('poseCanvas');
-    poseCtx = poseCanvas.getContext('2d');
-    gameCanvas = document.getElementById('gameCanvas');
-    gameCtx = gameCanvas.getContext('2d');
-
-    // Set canvas dimensions
-    gameCanvas.width = gameCanvas.offsetWidth;
-    gameCanvas.height = gameCanvas.offsetHeight;
+    video = document.getElementById("video");
+    poseCanvas = document.getElementById("poseCanvas");
+    poseCtx = poseCanvas.getContext("2d");
 
     // Add event listeners
-    document.getElementById('cameraBtn').addEventListener('click', toggleCamera);
-    document.getElementById('startBtn').addEventListener('click', startGame);
+    document
+        .getElementById("cameraBtn")
+        .addEventListener("click", toggleCamera);
+
+    // Initialize game
+    await initGame();
+    console.log("Game initialized.");
 }
 
 // Toggle camera on/off
 async function toggleCamera() {
-    const cameraBtn = document.getElementById('cameraBtn');
-    const loadingIndicator = document.getElementById('loadingIndicator');
+    const cameraBtn = document.getElementById("cameraBtn");
+    const loadingIndicator = document.getElementById("loadingIndicator");
 
     if (!cameraActive) {
         try {
             // Disable button and show loading
             cameraBtn.disabled = true;
             cameraActive = true;
-            loadingIndicator.classList.remove('hidden');
+            loadingIndicator.classList.remove("hidden");
 
             // Request camera access
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: {
                     width: { ideal: 640 },
-                    height: { ideal: 480 }
-                }
+                    height: { ideal: 480 },
+                },
             });
 
             // Set video source
@@ -56,7 +57,7 @@ async function toggleCamera() {
             });
 
             // Mirror video for better UX
-            video.style.transform = 'scaleX(-1)';
+            video.style.transform = "scaleX(-1)";
 
             // Set canvas dimensions to match video
             poseCanvas.width = video.videoWidth;
@@ -73,24 +74,25 @@ async function toggleCamera() {
             detectPose();
 
             // Update UI
-            cameraBtn.textContent = 'Stop Camera';
+            cameraBtn.textContent = "Stop Camera";
             cameraBtn.style.background = "#ff4500";
             cameraBtn.style.color = "#000";
             cameraBtn.disabled = false;
-            loadingIndicator.classList.add('hidden');
-
+            loadingIndicator.classList.add("hidden");
         } catch (error) {
-            console.error('Error accessing camera:', error);
-            alert('Could not access the camera. Please allow camera access and try again.');
+            console.error("Error accessing camera:", error);
+            alert(
+                "Could not access the camera. Please allow camera access and try again."
+            );
             cameraBtn.disabled = false;
-            loadingIndicator.classList.add('hidden');
+            loadingIndicator.classList.add("hidden");
         }
     } else {
         // Stop camera
         const stream = video.srcObject;
         if (stream) {
             const tracks = stream.getTracks();
-            tracks.forEach(track => track.stop());
+            tracks.forEach((track) => track.stop());
         }
 
         // Clear canvas
@@ -98,13 +100,15 @@ async function toggleCamera() {
 
         // Update UI
         cameraActive = false;
-        cameraBtn.textContent = 'Start Camera';
-        cameraBtn.style.background = '#333';
-        cameraBtn.style.color = '#ffaa00';
+        cameraBtn.textContent = "Start Camera";
+        cameraBtn.style.background = "#333";
+        cameraBtn.style.color = "#ffaa00";
 
         // Reset pose status
-        document.getElementById('poseStatus').textContent = 'IDLE';
-        document.querySelectorAll('.pose-item').forEach(item => item.classList.remove('active'));
+        document.getElementById("poseStatus").textContent = "IDLE";
+        document
+            .querySelectorAll(".pose-item")
+            .forEach((item) => item.classList.remove("active"));
     }
 }
 
@@ -116,7 +120,7 @@ async function loadPoseModel() {
             modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
         }
     );
-    console.log('Pose detection model loaded.');
+    console.log("Pose detection model loaded.");
 }
 
 async function detectPose() {
@@ -147,29 +151,40 @@ async function detectPose() {
                 // Update pose status
                 if (action !== currentPose) {
                     currentPose = action;
-                    document.getElementById('poseStatus').textContent = action.toUpperCase();
+                    document.getElementById("poseStatus").textContent =
+                        action.toUpperCase();
 
                     // Update pose indicators
-                    document.querySelectorAll('.pose-item').forEach(item => item.classList.remove('active'));
+                    document
+                        .querySelectorAll(".pose-item")
+                        .forEach((item) => item.classList.remove("active"));
 
-                    if (action === 'left punch') {
-                        document.getElementById('pose-left').classList.add('active');
-                    } else if (action === 'right punch') {
-                        document.getElementById('pose-right').classList.add('active');
-                    } else if (action === 'block') {
-                        document.getElementById('pose-block').classList.add('active');
-                    } else if (action === 'dodge') {
-                        document.getElementById('pose-dodge').classList.add('active');
+                    if (action === "left punch") {
+                        document
+                            .getElementById("pose-left")
+                            .classList.add("active");
+                    } else if (action === "right punch") {
+                        document
+                            .getElementById("pose-right")
+                            .classList.add("active");
+                    } else if (action === "block") {
+                        document
+                            .getElementById("pose-block")
+                            .classList.add("active");
+                    } else if (action === "dodge") {
+                        document
+                            .getElementById("pose-dodge")
+                            .classList.add("active");
                     }
                 }
-            }
 
-            if (gameRunning) {
-                handlePlayerAction(action);
+                if (gameRunning) {
+                    handlePlayerAction(action);
+                }
             }
         }
     } catch (error) {
-        console.error('Pose detection error:', error);
+        console.error("Pose detection error:", error);
     }
 
     requestAnimationFrame(detectPose);
@@ -179,17 +194,19 @@ function drawPose(pose) {
     const keypoints = pose.keypoints;
 
     // Draw keypoints
-    keypoints.forEach(keypoint => {
+    keypoints.forEach((keypoint) => {
         if (keypoint.score > 0.3) {
             poseCtx.beginPath();
             poseCtx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
-            poseCtx.fillStyle = '#ffaa00';
+            poseCtx.fillStyle = "#ffaa00";
             poseCtx.fill();
         }
     });
 
     // Draw skeleton
-    const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.MoveNet);
+    const adjacentKeyPoints = poseDetection.util.getAdjacentPairs(
+        poseDetection.SupportedModels.MoveNet
+    );
 
     adjacentKeyPoints.forEach(([i, j]) => {
         const kp1 = keypoints[i];
@@ -200,7 +217,7 @@ function drawPose(pose) {
             poseCtx.moveTo(kp1.x, kp1.y);
             poseCtx.lineTo(kp2.x, kp2.y);
             poseCtx.lineWidth = 2;
-            poseCtx.strokeStyle = '#ff6600';
+            poseCtx.strokeStyle = "#ff6600";
             poseCtx.stroke();
         }
     });
@@ -210,26 +227,30 @@ function detectAction(pose) {
     const keypoints = pose.keypoints;
 
     // Get key points
-    const leftWrist = keypoints.find(kp => kp.name === 'left_wrist');
-    const rightWrist = keypoints.find(kp => kp.name === 'right_wrist');
-    const leftShoulder = keypoints.find(kp => kp.name === 'left_shoulder');
-    const rightShoulder = keypoints.find(kp => kp.name === 'right_shoulder');
-    const nose = keypoints.find(kp => kp.name === 'nose');
-    const leftElbow = keypoints.find(kp => kp.name === 'left_elbow');
-    const rightElbow = keypoints.find(kp => kp.name === 'right_elbow');
+    const leftWrist = keypoints.find((kp) => kp.name === "left_wrist");
+    const rightWrist = keypoints.find((kp) => kp.name === "right_wrist");
+    const leftShoulder = keypoints.find((kp) => kp.name === "left_shoulder");
+    const rightShoulder = keypoints.find((kp) => kp.name === "right_shoulder");
+    const nose = keypoints.find((kp) => kp.name === "nose");
+    const leftElbow = keypoints.find((kp) => kp.name === "left_elbow");
+    const rightElbow = keypoints.find((kp) => kp.name === "right_elbow");
 
     // Detect actions based on pose
     if (rightElbow.y > rightWrist.y) {
-        const right_punch_angle = getAngle(rightShoulder, rightElbow, rightWrist);
+        const right_punch_angle = getAngle(
+            rightShoulder,
+            rightElbow,
+            rightWrist
+        );
         if (right_punch_angle > 140) {
-            return 'right punch'; // Right hand extended
+            return "right punch"; // Right hand extended
         }
     }
 
     if (leftElbow.y > leftWrist.y) {
         const left_punch_angle = getAngle(leftShoulder, leftElbow, leftWrist);
         if (left_punch_angle > 140) {
-            return 'left punch'; // Left hand extended
+            return "left punch"; // Left hand extended
         }
     }
 
@@ -237,17 +258,17 @@ function detectAction(pose) {
     const leftUpright = leftWrist.y < leftElbow.y;
     const rightUpright = rightWrist.y < rightElbow.y;
     if (leftUpright && rightUpright) {
-        return 'block';
+        return "block";
     }
 
     // Distance between shoulders
     const shoulderDist = Math.abs(rightShoulder.x - leftShoulder.x);
-    console.log('Shoulder Distance:', shoulderDist);
-    if (shoulderDist < 50) { // shoulders too close = rotated
-        return 'dodge';
+    if (shoulderDist < 50) {
+        // shoulders too close = rotated
+        return "dodge";
     }
 
-    return 'idle';
+    return "idle";
 }
 
 function getAngle(a, b, c) {
@@ -263,6 +284,6 @@ function getAngle(a, b, c) {
     return Math.acos(cosine) * (180 / Math.PI); // degrees
 }
 
-document.getElementById('startBtn').addEventListener('click', function () {
-    document.getElementById('gameOverlay').classList.add('hidden');
-})
+document.getElementById("startBtn").addEventListener("click", function () {
+    document.getElementById("gameOverlay").classList.add("hidden");
+});
