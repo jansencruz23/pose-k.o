@@ -42,7 +42,8 @@
             <!-- Flame accent -->
             <div class="flame-accent"></div>
 
-            <div id="gameOverlay" class="game-overlay">
+            <!-- Initial Control Screen -->
+            <div id="controlScreen" class="game-overlay">
                 <h1 class="game-title">Pose K.O.</h1>
                 <p class="game-subtitle">Pose to Victory!</p>
 
@@ -68,8 +69,54 @@
                     </ul>
                 </div>
 
-                <button id="startBtn" class="start-btn">FIGHT</button>
+                <button id="startBtn" class="start-btn">NEXT</button>
             </div>
+
+            <!-- Character Selection Screen -->
+             <div id="characterScreen" class="game-overlay hidden">
+                <h1 class="game-title">SELECT FIGHTER</h1>
+                <p class="game-subtitle">Choose your warrior</p>
+
+                <div class="selection-container">
+                    <div class="character-option" data-character="mac">
+                        <div class="character-image" id="macPreview"></div>
+                        <div class="character-name">LITTLE MAC</div>
+                    </div>
+                    <div class="character-option" data-character="don">
+                        <div class="character-image" id="donPreview"></div>
+                        <div class="character-name">DON FLAMENCO</div>
+                    </div>
+                    <div class="character-option" data-character="king">
+                        <div class="character-image" id="kingPreview"></div>
+                        <div class="character-name">KING HIPPO</div>
+                    </div>
+                </div>
+
+                <button id="characterSelectBtn" class="start-btn">NEXT</button>
+             </div>
+
+            <!-- Arena Selection Screen -->
+             <div id="arenaScreen" class="game-overlay hidden">
+                <h1 class="game-title">SELECT ARENA</h1>
+                <p class="game-subtitle">Choose your battlefield</p>
+
+                <div class="selection-container">
+                    <div class="arena-option" data-arena="wvba">
+                        <div class="arena-image" id="wvbaPreview"></div>
+                        <div class="arena-name">WVBA STADIUM</div>
+                    </div>
+                    <div class="arena-option" data-arena="tokyo">
+                        <div class="arena-image" id="tokyoPreview"></div>
+                        <div class="arena-name">TOKYO DOME</div>
+                    </div>
+                    <div class="arena-option" data-arena="vegas">
+                        <div class="arena-image" id="vegasPreview"></div>
+                        <div class="arena-name">LAS VEGAS</div>
+                    </div>
+                </div>
+
+                <button id="arenaSelectBtn" class="start-btn">FIGHT</button>
+             </div>
         </div>
 
         <div class="webcam-container">
@@ -116,10 +163,11 @@
             </div>
         </div>
     </div>
+        <script src="uiManager.js"></script>
     <script src="spriteManager.js"></script>
     <script src="player.js"></script>
     <script src="app.js"></script>
     <script src="sprite.js"></script>
-    <script src="game.js"></script>
+    <script src="gameManager.js"></script>
 </body>
 </html>

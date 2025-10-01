@@ -24,7 +24,7 @@ async function init() {
         .addEventListener("click", toggleCamera);
 
     // Initialize game
-    await initGame();
+    await gameManager.initGame();
     console.log("Game initialized.");
 }
 
@@ -178,8 +178,8 @@ async function detectPose() {
                     }
                 }
 
-                if (gameRunning) {
-                    handlePlayerAction(action);
+                if (gameManager.gameRunning) {
+                    gameManager.handlePlayerAction(action);
                 }
             }
         }
@@ -283,7 +283,3 @@ function getAngle(a, b, c) {
     const cosine = dot / (magAB * magCB);
     return Math.acos(cosine) * (180 / Math.PI); // degrees
 }
-
-document.getElementById("startBtn").addEventListener("click", function () {
-    document.getElementById("gameOverlay").classList.add("hidden");
-});

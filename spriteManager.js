@@ -9,15 +9,15 @@ class SpriteManager {
         const player_img = new Image();
         await new Promise((resolve) => {
             player_img.onload = resolve;
-            player_img.src = 'assets/sprites/little_mac.png';
+            player_img.src = 'assets/sprites/blue.png';
         });
 
         // Create sprite animations 
         this.spriteAnimations = {
             idle: {
                 frames: [
-                    new Sprite(player_img, 28, 10, 72, 161),
-                    new Sprite(player_img, 98, 10, 72, 161)
+                    new Sprite(player_img, 90, 10, 300, 450),
+                    new Sprite(player_img, 550, 10, 300, 450)
                 ],
                 currentFrame: 0,
                 frameCount: 2,
@@ -44,7 +44,7 @@ class SpriteManager {
             },
             block: {
                 frames: [
-                    new Sprite(player_img, 98, 309, 72, 161)
+                    new Sprite(player_img, 90, 1360, 300, 450)
                 ],
                 currentFrame: 0,
                 frameCount: 1,
