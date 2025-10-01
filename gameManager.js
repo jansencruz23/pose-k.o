@@ -22,7 +22,7 @@ class GameManager {
     }
 
     startGame(character, arena) {
-        document.getElementById("gameOverlay").classList.add("hidden");
+        document.getElementById("controlScreen").classList.add("hidden");
         this.gameRunning = true;
         this.arena = arena;
 
@@ -50,19 +50,19 @@ class GameManager {
     }
 
     gameLoop(timestamp) {
-        if (!gameRunning) return;
+        if (!this.gameRunning) return;
 
-        const deltaTime = timestamp - lastTime;
-        lastTime = timestamp;
+        const deltaTime = timestamp - this.lastTime;
+        this.lastTime = timestamp;
 
-        update(deltaTime);
-        render();
+        this.update(deltaTime);
+        this.render();
 
-        requestAnimationFrame((t) => gameLoop(t));
+        requestAnimationFrame((t) => this.gameLoop(t));
     }
 
     update(deltaTime) {
-        player.update(deltaTime);
+        this.player.update(deltaTime);
         // Future: Update opponent and other game elements
 
         // checkCollisions();
@@ -92,19 +92,38 @@ class GameManager {
 
         // Draw characters
         this.player.draw(this.gameCtx);
-        this.opponent.draw(this.gameCtx);
+        //this.opponent.draw(this.gameCtx);
 
         // Draw action labels
         this.gameCtx.fillStyle = "white";
         this.gameCtx.font = "16px Arial";
-        this.gameCtx.fillText("You", this.player.x, this.player.y - 10);
-        this.gameCtx.fillText(
-            document.querySelector(".opponent-health .health-label")
-                .textContent,
-            this.opponent.x,
-            this.opponent.y - 10
-        );
+        //this.gameCtx.fillText("You", this.player.x, this.player.y - 10);
+        //this.gameCtx.fillText(
+          //  document.querySelector(".opponent-health .health-label")
+            //    .textContent,
+            //this.opponent.x,
+            //this.opponent.y - 10
+        //);
     }
+
+    drawArena() {
+        switch(this.arena) {
+            case 'wvba':
+                this.gameCtx.fillStyle = 'rgba(30, 60, 120, 0.3)';
+                this.gameCtx.fillRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
+                break;
+            case 'tokyo':
+                // Simple red background for Tokyo
+                this.gameCtx.fillStyle = 'rgba(180, 30, 30, 0.3)';
+                this.gameCtx.fillRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
+                break;
+            case 'vegas':
+                // Simple purple background for Vegas
+                this.gameCtx.fillStyle = 'rgba(100, 30, 150, 0.3)';
+                this.gameCtx.fillRect(0, 0, this.gameCanvas.width, this.gameCanvas.height);
+                break;
+        }
+    } 
 
     handlePlayerAction(action) {
         let playerAction = "idle";

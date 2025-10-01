@@ -1,5 +1,5 @@
 class Player {
-    constructor(x, y, spriteManager) {
+    constructor(x, y, spriteManager, character) {
         this.x = x;
         this.y = y;
         this.width = 80;
@@ -8,6 +8,7 @@ class Player {
         this.action = 'idle';
         this.actionTime = 0;
         this.spriteManager = spriteManager;
+        this.character = character;
         this.facing = 'right';
         this.currentAnimation = null;
     }
@@ -21,7 +22,7 @@ class Player {
         }
 
         // Get the current animation based on action
-        this.currentAnimation = this.spriteManager.getAnimation('mac', this.getActionName());
+        this.currentAnimation = this.spriteManager.getAnimation(this.character, this.getActionName());
 
         // Update animation frames
         if (this.currentAnimation) {
@@ -60,7 +61,7 @@ class Player {
             }
 
             // Draw the sprite frame 
-            frame.draw(ctx, -this.width / 2, -this.height / 2, this.width, this.height);
+            frame.draw(ctx, -this.width / 2, -this.height / 2, this.width + 100, this.height + 150);
             ctx.restore();
         } else {
             ctx.fillStyle = '#ff6600';
