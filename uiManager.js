@@ -3,6 +3,8 @@ class UIManager {
         this.currentScreen = 'control';
         this.selectedCharacter = 'mac';
         this.selectedArena = 'wvba';
+        this.previewCanvases = {};
+        this.previewAnimations = {};
         this.setupEventListeners();
     }
 
@@ -34,6 +36,20 @@ class UIManager {
         // Arena select button
         document.getElementById('arenaSelectBtn').addEventListener('click', () => {
             this.startGame();
+        });
+
+        document.querySelectorAll('.character-option').forEach(option => {
+            option.addEventListener('mouseenter', () => {
+                this.previewAnimations[option.dataset.character].animation =
+                    spriteManager.getAnimation(option.dataset.character, 'leftJab');
+            });
+        });
+
+        document.querySelectorAll('.character-option').forEach(option => {
+            option.addEventListener('mouseleave', () => {
+                this.previewAnimations[option.dataset.character].animation =
+                    spriteManager.getAnimation(option.dataset.character, 'idle');
+            });
         });
     }
 
@@ -91,16 +107,93 @@ class UIManager {
     }
  
     // Load character previews
-    loadCharacterPreviews() {
-        // Load preview images
+    async loadCharacterPreviews() {
+        if (!spriteManager.loaded) {
+            await spriteManager.loadSprites();
+        }
 
-        // Placeholder only first
-        document.getElementById('macPreview').textContent = 'Mac Preview';
-        document.getElementById('donPreview').textContent = 'Don Preview';
-        document.getElementById('kingPreview').textContent = 'King Preview';
+        const characters = ['mac', 'don', 'king'];
+        
+        for (const character of characters) {
+            const canvasId = `${character}Preview`;
+            const canvas = document.getElementById(canvasId);
+
+            if (canvas) {
+                // Store canvas and context
+                this.previewCanvases[character] = {
+                    element: canvas,
+                    context: canvas.getContext('2d')
+                };
+
+                this.previewAnimations[character] = {
+                    animation: spriteManager.getAnimation(character, 'idle'),
+                    lastFrameTime: 0
+                };
+
+                // Start animation loop
+                this.animateCharacterPreview(character);
+            }
+        }
 
         // Default selection
         this.selectCharacter('mac');
+    }
+
+    // Animate character preview
+    animateCharacterPreview(character) {
+        if (!this.previewCanvases[character] || !this.previewAnimations[character]) return;
+
+        const canvas = this.previewCanvases[character].element;
+        const ctx = this.previewCanvases[character].context;
+        const animationState = this.previewAnimations[character];
+
+        // Animation loop
+        const animate = (timestamp) => {
+            // Stop animate after leaving character screen
+            if (this.currentScreen !== 'character') return;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Update animation
+            if (animationState.animation) {
+                spriteManager.updateAnimation(animationState.animation, timestamp);
+
+                // Get current frame
+                const frame = animationState.animation.frames[animationState.animation.currentFrame];
+
+                if (frame) {
+                    // Calculate scaling to fit canvas
+                    const scale = Math.min(
+                        canvas.width / frame.width,
+                        canvas.height / frame.height
+                    ) * 1; // 80% of canvas size
+
+                    const scaledWidth = frame.width * scale;   
+                    const scaledHeight = frame.height * scale;
+
+                    // Draw frame centered
+                    const x = (canvas.width - scaledWidth);
+                    const y = (canvas.height - scaledHeight);
+                    frame.draw(ctx, x, y, scaledWidth, scaledHeight);
+                }
+            }
+
+            requestAnimationFrame(animate);
+        };
+
+        requestAnimationFrame(animate);
+    }
+
+    stopPreviewAnimations() {
+        Object.values(this.previewCanvases).forEach(canvas => {
+            if (canvas && canvas.context){
+                canvas.context.clearRect(0, 0, canvas.element.width, canvas.element.height);
+            }
+        });
+
+        this.previewCanvases = {};
+        this.previewAnimations = {};
     }
 
     // Load arena previews
