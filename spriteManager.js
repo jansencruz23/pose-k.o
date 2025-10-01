@@ -7,9 +7,10 @@ class SpriteManager {
 
     async loadSprites() {
         const characterFiles = {
-            mac: "assets/sprites/blue.png",
-            don: "assets/sprites/green.png",
-            king: "assets/sprites/red.png",
+            'mac': "assets/sprites/blue.png",
+            'don': "assets/sprites/green.png",
+            'king': "assets/sprites/red.png",
+            'tyson': "assets/sprites/dodo.png",
         };
 
         // Load player sprite sheet

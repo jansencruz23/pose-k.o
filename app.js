@@ -11,6 +11,7 @@ if (document.readyState === "complete") {
 } else {
     window.addEventListener("load", init); // Wait for load event
 }
+
 // Initialize the application
 async function init() {
     // Get DOM elements
@@ -178,7 +179,7 @@ async function detectPose() {
                     }
                 }
 
-                if (gameManager.gameRunning) {
+                if (gameManager && gameManager.gameRunning) {
                     gameManager.handlePlayerAction(action);
                 }
             }

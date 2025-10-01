@@ -2,8 +2,8 @@ class Player {
     constructor(x, y, spriteManager, character) {
         this.x = x;
         this.y = y;
-        this.width = 80;
-        this.height = 120;
+        this.width = 150;
+        this.height = 200;
         this.health = 100;
         this.action = 'idle';
         this.actionTime = 0;
@@ -11,6 +11,16 @@ class Player {
         this.character = character;
         this.facing = 'right';
         this.currentAnimation = null;
+        this.lastHitTime = 0;
+        this.hitCooldown = 1000;
+
+        this.lastActionTime = 0;
+        this.actionCooldown = 300; 
+
+        // Pose tracking
+        this.currentPose = 'idle';
+        this.lastPoseTime = 0;
+        this.poseChangeCooldown = 700;
     }
 
     update(deltaTime) {
@@ -61,7 +71,7 @@ class Player {
             }
 
             // Draw the sprite frame 
-            frame.draw(ctx, -this.width / 2, -this.height / 2, this.width + 100, this.height + 150);
+            frame.draw(ctx, -this.width / 2, -this.height / 2, this.width, this.height);
             ctx.restore();
         } else {
             ctx.fillStyle = '#ff6600';
@@ -74,14 +84,45 @@ class Player {
         }
     }
 
+    canRegisterHit() {
+        const now = performance.now();
+        return now - this.lastHitTime > this.hitCooldown;
+    }
+
+    canPerformAction(action) {
+        const now = performance.now();
+        return now - this.lastActionTime > this.actionCooldown;
+    } 
+
     performAction(action) {
+        if (!this.canPerformAction(action)) return false;
+
         this.action = action;
         this.actionTime = 500;
+        this.lastActionTime = performance.now();
+
+        return true
     }
 
     takeDamage(amount) {
-        this.health -= amount;
+        if (!this.canRegisterHit()) return false;
         this.action = 'hit';
         this.actionTime = 300;
+        this.health -= amount;
+        this.lastHitTime = performance.now();
+        return true;
+    }
+
+    updatePose(pose) {
+        const now = performance.now();
+
+        if (pose === 'block' || pose === 'dodge' || now - this.lastPoseTime > this.poseChangeCooldown) {
+            this.currentPose = pose;
+            this.lastPoseTime = now;
+            this.performAction(pose);
+            return true;
+        }
+
+        return false;
     }
 }
