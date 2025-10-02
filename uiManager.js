@@ -201,9 +201,9 @@ class UIManager {
         // Load preview images
 
         // Placeholder only first
-        document.getElementById('wvbaPreview').textContent = 'WVBA Preview';
-        document.getElementById('tokyoPreview').textContent = 'Dojo Preview';
-        document.getElementById('vegasPreview').textContent = 'Vegas Preview';
+        document.getElementById('wvbaPreview').textContent = 'Computer Lab Preview';
+        document.getElementById('tokyoPreview').textContent = 'The Struggle Preview';
+        document.getElementById('vegasPreview').textContent = 'EYA Building Preview';
 
         // Default selection
         this.selectArena('wvba');

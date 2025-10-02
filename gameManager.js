@@ -45,8 +45,8 @@ class GameManager {
             don: "tyson",
             king: "tyson",
         };
-        document.querySelector(".opponent-health .health-label").textContent =
-            opponentNames[character];
+        //document.querySelector(".opponent-health .health-label").textContent =
+        //    opponentNames[character];
 
         // Start game loop
         this.lastTime = performance.now();
@@ -159,8 +159,7 @@ class GameManager {
         this.gameCtx.font = "16px Arial";
         this.gameCtx.fillText("You", this.player.x, this.player.y - 10);
         this.gameCtx.fillText(
-            document.querySelector(".opponent-health .health-label")
-                .textContent,
+            'Dodo',
             this.opponent.x,
             this.opponent.y - 10
         );
