@@ -8,6 +8,7 @@ class GameManager {
         this.lastTime = 0;
         this.arena = null;
         this.selectedCharacter = null;
+        this.arenaImages = {};
     }
 
     async initGame() {
@@ -18,8 +19,33 @@ class GameManager {
         this.gameCanvas.width = this.gameCanvas.offsetWidth;
         this.gameCanvas.height = this.gameCanvas.offsetHeight;
 
+        // Load arena images
+        await this.loadArenaImages();
+
         // Wait for sprites to load
         await spriteManager.loadSprites();
+    }
+
+    async loadArenaImages() {
+        const arenas = ["wvba", "tokyo", "vegas"];
+        const imagePromises = arenas.map((arena) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve({ arena, img });
+                img.onerror = () => {
+                    console.error(`Failed to load image for arena: ${arena}`);
+                    resolve({ arena, img: null });
+                };
+                img.src = `assets/arenas/${arena}.jpg`;
+            });
+        });
+
+        const loadedImages = await Promise.all(imagePromises);
+        loadedImages.forEach(({ arena, img }) => {
+            this.arenaImages[arena] = img;
+        });
+
+        console.log("Arena images loaded:", this.arenaImages);
     }
 
     startGame(character, arena) {
@@ -29,8 +55,8 @@ class GameManager {
         this.selectedCharacter = character;
 
         // Create player and opponent
-        this.player = new Player(100, 300, spriteManager, character);
-        this.opponent = new Opponent(500, 300, spriteManager, "tyson");
+        this.player = new Player(300, 300, spriteManager, character);
+        this.opponent = new Opponent(420, 300, spriteManager, "tyson");
 
         this.setOpponentDifficulty(character);
 
@@ -99,8 +125,7 @@ class GameManager {
             this.opponent.action !== "block" &&
             this.opponent.action !== "dodge"
         ) {
-            
-            if (this.player.canRegisterHit()){
+            if (this.player.canRegisterHit()) {
                 this.opponent.takeDamage(10);
                 document.getElementById("opponentHealthBar").style.width =
                     this.opponent.health + "%";
@@ -117,7 +142,7 @@ class GameManager {
             if (this.opponent.canRegisterHit()) {
                 this.player.takeDamage(15);
                 document.getElementById("playerHealthBar").style.width =
-                this.player.health + "%";
+                    this.player.health + "%";
             }
         }
     }
@@ -127,8 +152,8 @@ class GameManager {
         setTimeout(() => {
             alert(message);
             // Reset to control screen
-            document.getElementById('controlScreen').classList.remove('hidden');
-            uiManager.currentScreen = 'control';
+            document.getElementById("controlScreen").classList.remove("hidden");
+            uiManager.currentScreen = "control";
         }, 500);
     }
 
@@ -148,54 +173,81 @@ class GameManager {
         // Draw ring
         this.gameCtx.strokeStyle = "#8B4513";
         this.gameCtx.lineWidth = 4;
-        this.gameCtx.strokeRect(50, 200, this.gameCanvas.width - 100, 300);
+        this.gameCtx.strokeRect(100, 200, this.gameCanvas.width - 200, 300);
+
+        this.gameCtx.save();
+        this.gameCtx.scale(1.5, 1.5);
 
         // Draw characters
         this.player.draw(this.gameCtx);
         this.opponent.draw(this.gameCtx);
 
+        this.gameCtx.restore();
+
         // Draw action labels
         this.gameCtx.fillStyle = "white";
         this.gameCtx.font = "16px Arial";
-        this.gameCtx.fillText("You", this.player.x, this.player.y - 10);
         this.gameCtx.fillText(
-            'Dodo',
-            this.opponent.x,
-            this.opponent.y - 10
+            "",
+            this.player.x * 1.5,
+            this.player.y * 1.5 - 10
+        );
+        this.gameCtx.fillText(
+            "",
+            this.opponent.x * 1.5,
+            this.opponent.y * 1.5 - 10
         );
     }
 
     drawArena() {
-        switch (this.arena) {
-            case "wvba":
-                this.gameCtx.fillStyle = "rgba(30, 60, 120, 0.3)";
-                this.gameCtx.fillRect(
-                    0,
-                    0,
-                    this.gameCanvas.width,
-                    this.gameCanvas.height
-                );
-                break;
-            case "tokyo":
-                // Simple red background for Tokyo
-                this.gameCtx.fillStyle = "rgba(180, 30, 30, 0.3)";
-                this.gameCtx.fillRect(
-                    0,
-                    0,
-                    this.gameCanvas.width,
-                    this.gameCanvas.height
-                );
-                break;
-            case "vegas":
-                // Simple purple background for Vegas
-                this.gameCtx.fillStyle = "rgba(100, 30, 150, 0.3)";
-                this.gameCtx.fillRect(
-                    0,
-                    0,
-                    this.gameCanvas.width,
-                    this.gameCanvas.height
-                );
-                break;
+        const arenaImage = this.arenaImages[this.arena];
+
+        if (arenaImage) {
+            this.gameCtx.drawImage(
+                arenaImage,
+                0,
+                0,
+                this.gameCanvas.width,
+                this.gameCanvas.height
+            );
+        } else {
+            switch (this.arena) {
+                case "wvba":
+                    this.gameCtx.fillStyle = "rgba(30, 60, 120, 0.3)";
+                    this.gameCtx.fillRect(
+                        0,
+                        0,
+                        this.gameCanvas.width,
+                        this.gameCanvas.height
+                    );
+                    break;
+                case "tokyo":
+                    // Simple red background for Tokyo
+                    this.gameCtx.fillStyle = "rgba(180, 30, 30, 0.3)";
+                    this.gameCtx.fillRect(
+                        0,
+                        0,
+                        this.gameCanvas.width,
+                        this.gameCanvas.height
+                    );
+                    break;
+                case "vegas":
+                    // Simple purple background for Vegas
+                    this.gameCtx.fillStyle = "rgba(100, 30, 150, 0.3)";
+                    this.gameCtx.fillRect(
+                        0,
+                        0,
+                        this.gameCanvas.width,
+                        this.gameCanvas.height
+                    );
+                    break;
+            }
+            this.gameCtx.fillRect(
+                0,
+                0,
+                this.gameCanvas.width,
+                this.gameCanvas.height
+            );
         }
     }
 
