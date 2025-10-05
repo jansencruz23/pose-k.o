@@ -101,6 +101,14 @@ class Player {
         this.actionTime = 500;
         this.lastActionTime = performance.now();
 
+        // Play sound effects for punches
+        switch(action) {
+            case 'left punch':
+            case 'right punch':
+                soundManager.playSound('punch');
+                break;
+        }
+
         return true
     }
 
@@ -110,6 +118,10 @@ class Player {
         this.actionTime = 300;
         this.health -= amount;
         this.lastHitTime = performance.now();
+
+        // Play hit sound
+        soundManager.playSound('hit');
+
         return true;
     }
 

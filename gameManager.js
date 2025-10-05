@@ -24,6 +24,9 @@ class GameManager {
 
         // Wait for sprites to load
         await spriteManager.loadSprites();
+
+        // Initialize sound manager and load sounds
+        await soundManager.loadSounds();
     }
 
     async loadArenaImages() {
@@ -66,13 +69,8 @@ class GameManager {
         document.getElementById("playerHealthBar").style.width = "100%";
         document.getElementById("opponentHealthBar").style.width = "100%";
 
-        const opponentNames = {
-            mac: "tyson",
-            don: "tyson",
-            king: "tyson",
-        };
-        //document.querySelector(".opponent-health .health-label").textContent =
-        //    opponentNames[character];
+        // Start background music
+        soundManager.playBackgroundMusic(arena);
 
         // Start game loop
         this.lastTime = performance.now();
@@ -149,12 +147,61 @@ class GameManager {
 
     // Show game over message
     showGameOver(message) {
+        this.gameRunning = false;
+
+        // Play appropriate sound
+        if (message === "You Won!") {
+            soundManager.playSound("victory");
+        } else {
+            soundManager.playSound("defeat");
+        }
+
+        // Get the game over screen elements
+        const gameOverScreen = document.getElementById("gameOverScreen");
+        const gameOverMessage = document.getElementById("gameOverMessage");
+        const gameOverTitle = document.getElementById("gameOverTitle");
+        const finalPlayerHealth = document.getElementById("finalPlayerHealth");
+        const finalOpponentHealth = document.getElementById("finalOpponentHealth");
+
+        if (message === "You Won!") {
+            gameOverMessage.textContent = "YOU WIN! ANG GALING";
+            gameOverMessage.className = "game-over-message win";
+            gameOverTitle.textContent = "VICTORY!";
+        } else {
+            gameOverMessage.textContent = "YOU LOST! TRY AGAIN";
+            gameOverMessage.className = "game-over-message lose";
+            gameOverTitle.textContent = "DEFEAT!";
+        }
+
+        finalPlayerHealth.textContent = `${this.player.health > 0 ? this.player.health : 0}`;
+        finalOpponentHealth.textContent = `${this.opponent.health > 0 ? this.opponent.health : 0}`;
+
         setTimeout(() => {
-            alert(message);
-            // Reset to control screen
-            document.getElementById("controlScreen").classList.remove("hidden");
-            uiManager.currentScreen = "control";
+            gameOverScreen.classList.remove("hidden");
+            soundManager.stopBackgroundMusic();
         }, 500);
+    }
+
+    resetGame() {
+        this.gameRunning = false;
+        this.player = null;
+        this.opponent = null;
+
+        // Stop background music
+        soundManager.stopBackgroundMusic();
+
+        // Hide all screens
+        document.getElementById("gameOverScreen").classList.add("hidden");
+        document.getElementById("characterScreen").classList.add("hidden");
+        document.getElementById("arenaScreen").classList.add("hidden");
+
+        // Show control screen
+        document.getElementById("controlScreen").classList.remove("hidden");
+
+        // Update UI manager state
+        if (window.uiManager) {
+            window.uiManager.currentScreen = 'control';
+        }
     }
 
     render() {
@@ -169,11 +216,6 @@ class GameManager {
 
         // Draw arena background
         this.drawArena();
-
-        // Draw ring
-        this.gameCtx.strokeStyle = "#8B4513";
-        this.gameCtx.lineWidth = 4;
-        this.gameCtx.strokeRect(100, 200, this.gameCanvas.width - 200, 300);
 
         this.gameCtx.save();
         this.gameCtx.scale(1.5, 1.5);
@@ -242,12 +284,6 @@ class GameManager {
                     );
                     break;
             }
-            this.gameCtx.fillRect(
-                0,
-                0,
-                this.gameCanvas.width,
-                this.gameCanvas.height
-            );
         }
     }
 

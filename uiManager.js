@@ -6,6 +6,32 @@ class UIManager {
         this.previewCanvases = {};
         this.previewAnimations = {};
         this.setupEventListeners();
+        this.setupGameOverListeners();
+        this.arenaImages = {};
+    }
+
+    setupGameOverListeners() {
+        document.getElementById('playAgainBtn').addEventListener('click', () => {
+            this.playAgain();
+        });
+
+        document.getElementById('mainMenuBtn').addEventListener('click', () => {
+            this.returnToMainMenu();
+        });
+    }
+
+    playAgain() {
+        document.getElementById('gameOverScreen').classList.add('hidden');
+        this.showCharacterScreen();
+    }
+
+    returnToMainMenu() {
+        if (window.gameManager){
+            window.gameManager.resetGame();
+        }
+
+        // Play lobby music
+        soundManager.playLobbyMusic();
     }
 
     setupEventListeners() {
@@ -50,6 +76,12 @@ class UIManager {
                 this.previewAnimations[option.dataset.character].animation =
                     spriteManager.getAnimation(option.dataset.character, 'idle');
             });
+        });
+
+        // Mute button
+        document.getElementById('muteBtn').addEventListener('click', () => {
+            const isMuted = soundManager.toggleMute();
+            document.getElementById('muteBtn').textContent = isMuted ? 'UNMUTE' : 'MUTE';
         });
     }
 
@@ -196,15 +228,53 @@ class UIManager {
         this.previewAnimations = {};
     }
 
-    // Load arena previews
-    loadArenaPreviews() {
-        // Load preview images
+    async loadArenaImages() {
+        const arenas = ['wvba', 'tokyo', 'vegas'];
+        const imagePromises = arenas.map((arena => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve({arena, img});
+                img.onerror = () => {
+                    console.error(`Failed to load image for arena: ${arena}`);
+                    resolve({ arena, img: null });
+                };
+                img.src = `assets/arenas/${arena}.jpg`;
+            });
+        }));
 
-        // Placeholder only first
-        document.getElementById('wvbaPreview').textContent = 'Computer Lab Preview';
-        document.getElementById('tokyoPreview').textContent = 'The Struggle Preview';
-        document.getElementById('vegasPreview').textContent = 'EYA Building Preview';
+        const loadedImages = await Promise.all(imagePromises);
+        loadedImages.forEach(({ arena, img }) => {
+            this.arenaImages[arena] = img;
+        });
 
+        console.log("Arena preview images loaded:", this.arenaImages);
+    }
+
+    async loadArenaPreviews() {
+        if (Object.keys(this.arenaImages).length === 0)  {
+            await this.loadArenaImages();
+        }
+
+        const arenas = ['wvba', 'tokyo', 'vegas'];
+        arenas.forEach(arena => {
+            const canvas = document.getElementById(`${arena}Preview`);
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                const img = this.arenaImages[arena];
+
+                if (img) {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                } else {
+                    ctx.fillStyle = '#222';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '16px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Image not available', canvas.width / 2, canvas.height / 2);
+                }
+            }
+        });
+        
         // Default selection
         this.selectArena('wvba');
     }

@@ -493,6 +493,99 @@ body::before {
     margin-top: 5px;
 }
 
+/* Game Over Screen */
+.game-over-container {
+    background: rgba(20, 10, 30, 0.9);
+    border: 3px solid #ff4500;
+    border-radius: 10px;
+    padding: 30px;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255, 69, 0, 0.5);
+}
+
+.game-over-title {
+    font-size: 42px;
+    color: #ff4500;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px rgba(255, 69, 0, 0.7);
+}
+
+.game-over-message {
+    font-size: 32px;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.game-over-message.win {
+    color: #4CAF50;
+    text-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
+}
+
+.game-over-message.lose {
+    color: #F44336;
+    text-shadow: 0 0 10px rgba(244, 67, 54, 0.7);
+}
+
+.game-over-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 10px;
+    color: #ff6600;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 18px;
+    color: #ffaa00;
+}
+
+.game-over-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.game-over-btn {
+    padding: 12px 25px;
+    font-size: 14px;
+    background: #333;
+    border: 2px solid #ff4500;
+    color: #ffaa00;
+    font-family: 'Press Start 2P', cursive;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.game-over-btn:hover {
+    background: #ff4500;
+    color: #000;
+    transform: scale(1.05);
+}
+
+/* Animation for game over screen */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.game-over-message {
+    animation: pulse 2s infinite;
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg);

@@ -24,8 +24,13 @@ async function init() {
         .getElementById("cameraBtn")
         .addEventListener("click", toggleCamera);
 
+    // Play lobby music
+    soundManager.playLobbyMusic();
+
     // Initialize game
     await gameManager.initGame();
+    await toggleCamera();
+
     console.log("Game initialized.");
 }
 
