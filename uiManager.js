@@ -2,7 +2,7 @@ class UIManager {
     constructor() {
         this.currentScreen = 'control';
         this.selectedCharacter = 'mac';
-        this.selectedArena = 'wvba';
+        this.selectedArena = 'struggle';
         this.previewCanvases = {};
         this.previewAnimations = {};
         this.setupEventListeners();
@@ -23,6 +23,9 @@ class UIManager {
     playAgain() {
         document.getElementById('gameOverScreen').classList.add('hidden');
         this.showCharacterScreen();
+
+        // Play lobby music
+        soundManager.playLobbyMusic();
     }
 
     returnToMainMenu() {
@@ -229,7 +232,7 @@ class UIManager {
     }
 
     async loadArenaImages() {
-        const arenas = ['wvba', 'tokyo', 'vegas'];
+        const arenas = ['lab', 'struggle', 'eya'];
         const imagePromises = arenas.map((arena => {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -255,7 +258,7 @@ class UIManager {
             await this.loadArenaImages();
         }
 
-        const arenas = ['wvba', 'tokyo', 'vegas'];
+        const arenas = ['lab', 'struggle', 'eya'];
         arenas.forEach(arena => {
             const canvas = document.getElementById(`${arena}Preview`);
             if (canvas) {
@@ -276,7 +279,7 @@ class UIManager {
         });
         
         // Default selection
-        this.selectArena('wvba');
+        this.selectArena('lab');
     }
 }
 

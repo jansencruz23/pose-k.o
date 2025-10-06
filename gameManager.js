@@ -27,10 +27,13 @@ class GameManager {
 
         // Initialize sound manager and load sounds
         await soundManager.loadSounds();
+
+        // Play character selection music
+        soundManager.playLobbyMusic();
     }
 
     async loadArenaImages() {
-        const arenas = ["wvba", "tokyo", "vegas"];
+        const arenas = ['lab', 'struggle', 'eya'];
         const imagePromises = arenas.map((arena) => {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -254,7 +257,7 @@ class GameManager {
             );
         } else {
             switch (this.arena) {
-                case "wvba":
+                case "lab":
                     this.gameCtx.fillStyle = "rgba(30, 60, 120, 0.3)";
                     this.gameCtx.fillRect(
                         0,
@@ -263,7 +266,7 @@ class GameManager {
                         this.gameCanvas.height
                     );
                     break;
-                case "tokyo":
+                case "struggle":
                     // Simple red background for Tokyo
                     this.gameCtx.fillStyle = "rgba(180, 30, 30, 0.3)";
                     this.gameCtx.fillRect(
@@ -273,7 +276,7 @@ class GameManager {
                         this.gameCanvas.height
                     );
                     break;
-                case "vegas":
+                case "eya":
                     // Simple purple background for Vegas
                     this.gameCtx.fillStyle = "rgba(100, 30, 150, 0.3)";
                     this.gameCtx.fillRect(
