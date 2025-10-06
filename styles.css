@@ -362,15 +362,15 @@ body::before {
 
 /* Health bar states for different health levels */
 .health-bar.high {
-    background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39); /* Green */
+    background: linear-gradient(90deg, #8BC34A, #8BC34A); /* Green */
 }
 
 .health-bar.medium {
-    background: linear-gradient(90deg, #FFC107, #FF9800, #FF5722); /* Orange/Yellow */
+    background: linear-gradient(90deg, #FF9800, #FF9800); /* Orange/Yellow */
 }
 
 .health-bar.low {
-    background: linear-gradient(90deg, #F44336, #E91E63, #9C27B0); /* Red/Purple */
+    background: linear-gradient(90deg, #F44336); /* Red/Purple */
 }
 
 .health-label {
