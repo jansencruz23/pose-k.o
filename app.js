@@ -24,9 +24,6 @@ async function init() {
         .getElementById("cameraBtn")
         .addEventListener("click", toggleCamera);
 
-    // Play lobby music
-    soundManager.playLobbyMusic();
-
     // Initialize game
     await gameManager.initGame();
     await toggleCamera();
@@ -82,7 +79,7 @@ async function toggleCamera() {
             // Update UI
             cameraBtn.textContent = "Stop Camera";
             cameraBtn.style.background = "#ff4500";
-            cameraBtn.style.color = "#000";
+            cameraBtn.style.color = "#fff";
             cameraBtn.disabled = false;
             loadingIndicator.classList.add("hidden");
         } catch (error) {

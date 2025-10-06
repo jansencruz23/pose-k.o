@@ -21,6 +21,9 @@ class Opponent {
     }
 
     update(deltaTime) {
+        // Pause updates during countdown
+        if (window.gameManager && window.gameManager.countdownActive) return;
+
         if (this.actionTime > 0){
             this.actionTime -= deltaTime;
             if (this.actionTime <= 0) {

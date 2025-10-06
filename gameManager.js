@@ -9,6 +9,12 @@ class GameManager {
         this.arena = null;
         this.selectedCharacter = null;
         this.arenaImages = {};
+
+        // Countdown properties
+        this.countdown = 3;
+        this.countdownActive = true;
+        this.countdownDuration = 1000;
+        this.countdownStartTime = 0;
     }
 
     async initGame() {
@@ -28,12 +34,12 @@ class GameManager {
         // Initialize sound manager and load sounds
         await soundManager.loadSounds();
 
-        // Play character selection music
+        // Play lobby music
         soundManager.playLobbyMusic();
     }
 
     async loadArenaImages() {
-        const arenas = ['lab', 'struggle', 'eya'];
+        const arenas = ["lab", "struggle", "eya"];
         const imagePromises = arenas.map((arena) => {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -69,11 +75,19 @@ class GameManager {
         // Reset health
         this.player.health = 100;
         this.opponent.health = 100;
-        document.getElementById("playerHealthBar").style.width = "100%";
-        document.getElementById("opponentHealthBar").style.width = "100%";
+
+        this.updateHealthBar("player", 100);
+        this.updateHealthBar("opponent", 100);
 
         // Start background music
         soundManager.playBackgroundMusic(arena);
+
+        // Initialize countdown
+        this.countdown = 3;
+        this.countdownActive = true;
+        this.countdownStartTime = performance.now();
+
+        soundManager.playSound("countdown");
 
         // Start game loop
         this.lastTime = performance.now();
@@ -96,10 +110,29 @@ class GameManager {
         const deltaTime = timestamp - this.lastTime;
         this.lastTime = timestamp;
 
-        this.update(deltaTime);
-        this.render();
+        if (this.countdownActive) {
+            this.updateCountdown(timestamp);
+        } else {
+            this.update(deltaTime);
+        }
 
+        this.render();
         requestAnimationFrame((t) => this.gameLoop(t));
+    }
+
+    updateCountdown(timestamp) {
+        const elapsed = timestamp - this.countdownStartTime;
+
+        if (elapsed >= this.countdownDuration) {
+            this.countdown--;
+            this.countdownStartTime = timestamp;
+
+            if (this.countdown > 0) {
+                //soundManager.playSound('countdown');
+            } else {
+                this.countdownActive = false;
+            }
+        }
     }
 
     update(deltaTime) {
@@ -128,8 +161,7 @@ class GameManager {
         ) {
             if (this.player.canRegisterHit()) {
                 this.opponent.takeDamage(10);
-                document.getElementById("opponentHealthBar").style.width =
-                    this.opponent.health + "%";
+                this.updateHealthBar("opponent", this.opponent.health);
             }
         }
 
@@ -142,8 +174,7 @@ class GameManager {
         ) {
             if (this.opponent.canRegisterHit()) {
                 this.player.takeDamage(15);
-                document.getElementById("playerHealthBar").style.width =
-                    this.player.health + "%";
+                this.updateHealthBar("player", this.player.health);
             }
         }
     }
@@ -164,10 +195,12 @@ class GameManager {
         const gameOverMessage = document.getElementById("gameOverMessage");
         const gameOverTitle = document.getElementById("gameOverTitle");
         const finalPlayerHealth = document.getElementById("finalPlayerHealth");
-        const finalOpponentHealth = document.getElementById("finalOpponentHealth");
+        const finalOpponentHealth = document.getElementById(
+            "finalOpponentHealth"
+        );
 
         if (message === "You Won!") {
-            gameOverMessage.textContent = "YOU WIN! ANG GALING";
+            gameOverMessage.textContent = "YOU WIN!";
             gameOverMessage.className = "game-over-message win";
             gameOverTitle.textContent = "VICTORY!";
         } else {
@@ -176,8 +209,12 @@ class GameManager {
             gameOverTitle.textContent = "DEFEAT!";
         }
 
-        finalPlayerHealth.textContent = `${this.player.health > 0 ? this.player.health : 0}`;
-        finalOpponentHealth.textContent = `${this.opponent.health > 0 ? this.opponent.health : 0}`;
+        finalPlayerHealth.textContent = `${
+            this.player.health > 0 ? this.player.health : 0
+        }`;
+        finalOpponentHealth.textContent = `${
+            this.opponent.health > 0 ? this.opponent.health : 0
+        }`;
 
         setTimeout(() => {
             gameOverScreen.classList.remove("hidden");
@@ -189,6 +226,10 @@ class GameManager {
         this.gameRunning = false;
         this.player = null;
         this.opponent = null;
+
+        // Reset countdown
+        this.countdown = 3;
+        this.countdownActive = true;
 
         // Stop background music
         soundManager.stopBackgroundMusic();
@@ -203,7 +244,7 @@ class GameManager {
 
         // Update UI manager state
         if (window.uiManager) {
-            window.uiManager.currentScreen = 'control';
+            window.uiManager.currentScreen = "control";
         }
     }
 
@@ -229,19 +270,49 @@ class GameManager {
 
         this.gameCtx.restore();
 
-        // Draw action labels
-        this.gameCtx.fillStyle = "white";
-        this.gameCtx.font = "16px Arial";
-        this.gameCtx.fillText(
-            "",
-            this.player.x * 1.5,
-            this.player.y * 1.5 - 10
+        // Draw countdown if active
+        if (this.countdownActive) {
+            this.drawCountdown();
+        }
+    }
+
+    drawCountdown() {
+        const centerX = this.gameCanvas.width / 2;
+        const centerY = this.gameCanvas.height / 2;
+
+        // Draw semi-transparent overlay
+        this.gameCtx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        this.gameCtx.fillRect(
+            0,
+            0,
+            this.gameCanvas.width,
+            this.gameCanvas.height
         );
+
+        // Draw countdown number
+        this.gameCtx.fillStyle = "#ff4500";
+        this.gameCtx.font = "bold 120px 'Press Start 2P', cursive";
+        this.gameCtx.textAlign = "center";
+        this.gameCtx.textBaseline = "middle";
+
+        // Add glow effect
+        this.gameCtx.shadowColor = "#ff4500";
+        this.gameCtx.shadowBlur = 20;
+
+        // Draw the current countdown number
         this.gameCtx.fillText(
-            "",
-            this.opponent.x * 1.5,
-            this.opponent.y * 1.5 - 10
+            this.countdown > 0 ? this.countdown : "FIGHT!",
+            centerX,
+            centerY
         );
+
+        // Reset shadow
+        this.gameCtx.shadowColor = "transparent";
+        this.gameCtx.shadowBlur = 0;
+
+        // Reset text alignment
+        this.gameCtx.textAlign = "start";
+        this.gameCtx.textBaseline = "alphabetic";
     }
 
     drawArena() {
@@ -293,6 +364,24 @@ class GameManager {
     handlePlayerAction(action) {
         if (this.gameRunning && this.player) {
             this.player.updatePose(action);
+        }
+    }
+
+    updateHealthBar(character, health) {
+        const healthBarId =
+            character === "player" ? "playerHealthBar" : "opponentHealthBar";
+        const healthBar = document.getElementById(healthBarId);
+        const healthPercentage = healthBar.querySelector(".health-percentage");
+
+        healthBar.style.width = health + "%";
+        healthBar.classList.remove("high", "medium", "low");
+
+        if (health > 60) {
+            healthBar.classList.add("high");
+        } else if (health > 30) {
+            healthBar.classList.add("medium");
+        } else {
+            healthBar.classList.add("low");
         }
     }
 }

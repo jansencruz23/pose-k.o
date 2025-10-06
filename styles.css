@@ -331,36 +331,55 @@ body::before {
 /* Health bars */
 .health-bar-container {
     position: absolute;
-    top: 20px;
-    width: 200px;
-    height: 20px;
-    background: #333;
-    border: 2px solid;
+    top: 30px;
+    width: 300px; /* Increased from 200px */
+    height: 30px; /* Increased from 20px */
+    background: #222;
+    border: 3px solid #444; /* Thicker border */
     z-index: 5;
-    border-radius: 4px;
+    border-radius: 15px; /* Much more rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden; /* Ensures the inner health bar respects the border-radius */
 }
 
 .player-health {
-    left: 20px;
+    left: 30px; /* Adjusted position */
     border-color: #ff6600;
 }
 
 .opponent-health {
-    right: 20px;
-    border-color: #ff4500;
+    right: 30px; /* Adjusted position */
+    border-color: #ff6600;
 }
 
 .health-bar {
     height: 100%;
-    background: linear-gradient(90deg, #ffaa00, #ff6600, #ff4500);
-    border-radius: 2px;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39); /* Green gradient for full health */
+    border-radius: 12px; /* Slightly less than container to create a border effect */
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.3);
+    transition: width 0.5s ease; /* Smooth transition when health changes */
+}
+
+/* Health bar states for different health levels */
+.health-bar.high {
+    background: linear-gradient(90deg, #4CAF50, #8BC34A, #CDDC39); /* Green */
+}
+
+.health-bar.medium {
+    background: linear-gradient(90deg, #FFC107, #FF9800, #FF5722); /* Orange/Yellow */
+}
+
+.health-bar.low {
+    background: linear-gradient(90deg, #F44336, #E91E63, #9C27B0); /* Red/Purple */
 }
 
 .health-label {
     position: absolute;
-    top: -20px;
-    font-size: 8px;
+    top: -25px; /* Moved up slightly */
+    font-size: 10px; /* Increased font size */
     color: #ddd;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-weight: bold;
 }
 
 .player-health .health-label {
@@ -369,6 +388,19 @@ body::before {
 
 .opponent-health .health-label {
     right: 0;
+}
+
+/* Add a health percentage display */
+.health-percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-weight: bold;
+    z-index: 6; /* Above the health bar */
 }
 
 /* Corner decorations */

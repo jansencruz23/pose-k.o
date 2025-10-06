@@ -126,6 +126,9 @@ class Player {
     }
 
     updatePose(pose) {
+        // Ignore pose updates during countdown
+        if (window.gameManager && window.gameManager.countdownActive) return false;
+
         const now = performance.now();
 
         if (pose === 'block' || pose === 'dodge' || now - this.lastPoseTime > this.poseChangeCooldown) {

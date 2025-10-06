@@ -6,6 +6,8 @@ class SoundManager {
         this.currentBackgroundMusic = null;
         this.isMuted = false;
         this.volume = 0.7;
+        this.userInteracted = false; 
+        this.pendingMusic = null;
     }
 
     async loadSounds() {
@@ -48,7 +50,8 @@ class SoundManager {
             'punch': 'assets/sounds/punch.mp3',
             'hit': 'assets/sounds/hit.mp3',
             'victory': 'assets/sounds/victory.mp3',
-            'defeat': 'assets/sounds/defeat.mp3'
+            'defeat': 'assets/sounds/defeat.mp3',
+            'countdown': 'assets/sounds/countdown.mp3',
         };
 
         const loadPromises = Object.entries(soundFiles).map(([name, path]) => {
@@ -67,10 +70,47 @@ class SoundManager {
 
         await Promise.all(loadPromises);
         console.log('All sounds loaded');
+
+        this.setupInteractionListeners();
+    }
+
+    setupInteractionListeners() {
+        const interactionEvents = ['click', 'keydown', 'touchstart'];
+
+        const handleInteractions = () => {
+            this.userInteracted = true;
+
+            // Play any pending music
+            if (this.pendingMusic) {
+                if (this.pendingMusic === 'lobby') {
+                    this.playLobbyMusic();
+                } else {
+                    this.playBackgroundMusic(this.pendingMusic);
+                }
+                this.pendingMusic = null;
+            }
+
+            // Remove listeners after first interaction
+            interactionEvents.forEach(event => {
+                document.removeEventListener(event, handleInteractions, true);
+            });
+        };
+
+        // Add listeners for user interaction
+        interactionEvents.forEach(event => {
+            document.addEventListener(event, handleInteractions, true);
+        });
     }
 
     playLobbyMusic() {
         if (this.isMuted) return;
+
+        if (!this.userInteracted) {
+            this.pendingMusic = 'lobby';
+            return;
+        }
+
+        if (this.currentBackgroundMusic === this.lobbyMusic) return;
 
         this.stopBackgroundMusic();
 
@@ -83,6 +123,11 @@ class SoundManager {
 
     playBackgroundMusic(arena) {
         if (this.isMuted) return;
+
+        if (!this.userInteracted) {
+            this.pendingMusic = arena;
+            return;
+        }
 
         // Stop any currently playing music
         this.stopBackgroundMusic();

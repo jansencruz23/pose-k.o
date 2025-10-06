@@ -27,10 +27,11 @@
                 <div class="health-bar-container player-health">
                     <div class="health-label">PLAYER</div>
                     <div
-                        class="health-bar"
+                        class="health-bar high"
                         id="playerHealthBar"
                         style="width: 100%"
-                    ></div>
+                    >
+                    </div>
                 </div>
 
                 <div class="health-bar-container opponent-health">
@@ -39,7 +40,8 @@
                         class="health-bar"
                         id="opponentHealthBar"
                         style="width: 100%"
-                    ></div>
+                    >
+                    </div>
                 </div>
 
                 <!-- Corner decorations -->
@@ -94,7 +96,7 @@
                                 width="180"
                                 height="180"
                             ></canvas>
-                            <div class="character-name">CHARACTER #1</div>
+                            <div class="character-name">INIGO</div>
                         </div>
                         <div class="character-option" data-character="don">
                             <canvas
@@ -103,7 +105,7 @@
                                 width="180"
                                 height="180"
                             ></canvas>
-                            <div class="character-name">CHARACTER #2</div>
+                            <div class="character-name">CASSIE</div>
                         </div>
                         <div class="character-option" data-character="king">
                             <canvas
@@ -156,24 +158,39 @@
                 <!-- Game Over Screen -->
                 <div id="gameOverScreen" class="game-overlay hidden">
                     <div class="game-over-container">
-                        <h1 id="gameOverTitle" class="game-over-title">GAME OVER</h1>
-                        <div id="gameOverMessage" class="game-over-message">YOU WIN!</div>
+                        <h1 id="gameOverTitle" class="game-over-title">
+                            GAME OVER
+                        </h1>
+                        <div id="gameOverMessage" class="game-over-message">
+                            YOU WIN!
+                        </div>
 
                         <div class="game-over-stats">
                             <div class="stat-item">
                                 <div class="stat-label">YOUR HEALTH</div>
-                                <div id="finalPlayerHealth" class="stat-value">100%</div>
+                                <div id="finalPlayerHealth" class="stat-value">
+                                    100%
+                                </div>
                             </div>
                             <div class="stat-item">
                                 <div class="stat-label">DODO'S HEALTH</div>
-                                <div id="finalOpponentHealth" class="stat-value">0%</div>
+                                <div
+                                    id="finalOpponentHealth"
+                                    class="stat-value"
+                                >
+                                    0%
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="game-over-actions">
-                        <button id="playAgainBtn" class="game-over-btn">PLAY AGAIN</button>
-                        <button id="mainMenuBtn" class="game-over-btn">MAIN MENU</button>
+                        <button id="playAgainBtn" class="game-over-btn">
+                            PLAY AGAIN
+                        </button>
+                        <button id="mainMenuBtn" class="game-over-btn">
+                            MAIN MENU
+                        </button>
                     </div>
                 </div>
             </div>
@@ -195,7 +212,7 @@
 
                 <div class="controls">
                     <button id="cameraBtn" class="btn">OPEN CAMERA</button>
-                    <button id="muteBtn" class="btn">MUTE</button>
+                    <button id="muteBtn" class="btn hidden">MUTE</button>
 
                     <div class="status-container">
                         <div class="status-label">CURRENT POSE</div>
